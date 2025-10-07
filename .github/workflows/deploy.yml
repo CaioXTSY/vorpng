@@ -33,13 +33,14 @@ jobs:
       - name: Install sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      # 5) Limpa tudo no servidor, preservando apenas .env e uploads
-      - name: Clean remote directory (keep .env and uploads)
+      # 5) Cria diretório se não existir e limpa preservando .env e uploads
+      - name: Create directory and clean (keep .env and uploads)
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
-            "cd /www/wwwroot/vorpng && \
-             find . -mindepth 1 -maxdepth 1 ! -name '.env' ! -name 'uploads' -exec rm -rf {} +"
+            "mkdir -p /www/wwwroot/vorpng && \
+             cd /www/wwwroot/vorpng && \
+             find . -mindepth 1 -maxdepth 1 ! -name '.env' ! -name 'uploads' -exec rm -rf {} + 2>/dev/null || true"
 
       # 6) Copia a pasta dist inteira e arquivos de configuração
       - name: Copy build & config to server
