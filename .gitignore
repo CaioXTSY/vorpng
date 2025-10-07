@@ -1,0 +1,67 @@
+# Node.gitignore - common patterns for Node.js projects
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Coverage directory
+coverage/
+.nyc_output/
+
+# Build output
+dist/
+build/
+out/
+
+# Parcel / Next / Nuxt / Gatsby caches and outputs
+.cache/
+.next/
+.nuxt/
+public/
+
+# Serverless files
+.serverless/
+
+# dotenv environment variables
+.env
+.env.*.local
+
+# Optional npm pack output
+*.tgz
+
+# Compiled binary addons
+build/Release
+
+# IDEs and OS files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.DS_Store
+Thumbs.db
+/generated/prisma

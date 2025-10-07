@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relacionamento com as imagens
+  images Image[]
+
+  @@map("users")
+}
+
+model Image {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid()) // UUID único para acesso seguro
+  filename    String   // Nome original do arquivo
+  mimeType    String   @map("mime_type") // Tipo MIME (image/jpeg, image/png, etc.)
+  size        Int      // Tamanho do arquivo em bytes
+  filePath    String   @map("file_path") @db.Text // Caminho do arquivo no servidor
+  publicUrl   String?  @map("public_url") @db.Text // URL pública (se aplicável)
+  status      String   @default("uploaded") // uploaded, processing, error, deleted
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relacionamento com o usuário
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([uuid])
+  @@map("images")
+}
