@@ -32,7 +32,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
+  SwaggerModule.setup('', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
     },
@@ -40,6 +40,6 @@ async function bootstrap() {
 
   await app.listen(3030);
   console.log('🚀 Servidor rodando em http://localhost:3030');
-  console.log('📚 Documentação Swagger disponível em http://localhost:3030/api');
+  console.log('📚 Documentação Swagger disponível em http://localhost:3030');
 }
 bootstrap();
