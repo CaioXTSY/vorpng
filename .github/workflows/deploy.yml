@@ -1,0 +1,79 @@
+name: Full clean & deploy via sshpass
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2) Setup Node.js e cache npm
+      - name: Setup Node.js & Cache npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 3) Instala dependências e build local
+      - name: Install dependencies & Build
+        run: |
+          npm ci
+          npm run build
+
+      # 4) Instala sshpass
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      # 5) Limpa tudo no servidor, preservando apenas .env e uploads
+      - name: Clean remote directory (keep .env and uploads)
+        run: |
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+            "cd /www/wwwroot/vorpng && \
+             find . -mindepth 1 -maxdepth 1 ! -name '.env' ! -name 'uploads' -exec rm -rf {} +"
+
+      # 6) Copia a pasta dist inteira e arquivos de configuração
+      - name: Copy build & config to server
+        run: |
+          # copia dist/ para o servidor, recriando /vorpng/dist
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" \
+            scp -o StrictHostKeyChecking=no -r \
+            dist \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/www/wwwroot/vorpng
+          # copia prisma e package files
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" \
+            scp -o StrictHostKeyChecking=no -r \
+            prisma package.json package-lock.json \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/www/wwwroot/vorpng
+
+      # 7) Executa deploy remoto: install, prisma, pm2
+      - name: Remote deploy commands
+        run: |
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+            "cd /www/wwwroot/vorpng && \
+             echo '--- Instalando dependências de produção ---' && \
+             npm ci --production && \
+             echo '--- Gerando Prisma Client ---' && \
+             npx prisma generate && \
+             echo '--- Aplicando migrations ou db push ---' && \
+             if [ -d prisma/migrations ] && [ \"\$(ls -A prisma/migrations)\" ]; then \
+               npx prisma migrate deploy || echo '⚠️ Sem novas migrations'; \
+             else \
+               npx prisma db push || echo '⚠️ Erro no db push'; \
+             fi && \
+             echo '--- Criando diretório uploads se não existir ---' && \
+             mkdir -p uploads && \
+             echo '--- Reiniciando PM2 ---' && \
+             pm2 delete vorpng || true && \
+             pm2 start dist/main.js --name vorpng -f && \
+             echo '✅ Deploy concluído com sucesso - Servidor rodando na porta 3030'"
