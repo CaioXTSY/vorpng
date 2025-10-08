@@ -40,7 +40,7 @@ export class ImageResponseDto {
 
   @ApiProperty({
     description: 'URL para download da imagem',
-    example: 'http://localhost:3000/images/f47ac10b-58cc-4372-a567-0e02b2c3d479/download',
+    example: 'https://your-domain.com/images/f47ac10b-58cc-4372-a567-0e02b2c3d479/download',
   })
   downloadUrl?: string;
 }

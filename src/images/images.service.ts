@@ -169,6 +169,7 @@ export class ImagesService {
   }
 
   private mapToDto(image: any): ImageResponseDto {
+    const siteUrl = this.configService.get<string>('SITE_URL') || 'http://localhost:3030';
     return {
       uuid: image.uuid,
       filename: image.filename,
@@ -176,7 +177,7 @@ export class ImagesService {
       size: image.size,
       status: image.status,
       createdAt: image.createdAt,
-      downloadUrl: `http://localhost:3000/images/${image.uuid}/download`,
+      downloadUrl: `${siteUrl}/images/${image.uuid}/download`,
     };
   }
 
