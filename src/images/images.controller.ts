@@ -4,6 +4,7 @@ import {
   Get,
   Delete,
   Param,
+  Query,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -24,7 +25,9 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ImagesService } from './images.service';
+import { CatService } from './cat.service';
 import { ImageResponseDto, UploadResponseDto, ImageListDto } from './dto/image.dto';
+import { CatImageDto, CatQueryDto } from './dto/cat.dto';
 import * as fs from 'fs';
 
 @ApiTags('images')
@@ -32,7 +35,10 @@ import * as fs from 'fs';
 @UseGuards(JwtAuthGuard)
 @Controller('images')
 export class ImagesController {
-  constructor(private readonly imagesService: ImagesService) {}
+  constructor(
+    private readonly imagesService: ImagesService,
+    private readonly catService: CatService,
+  ) {}
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -99,6 +105,38 @@ export class ImagesController {
   })
   async getUserImages(@Request() req): Promise<ImageListDto> {
     return await this.imagesService.getUserImages(req.user.id);
+  }
+
+  @Get('random-cat')
+  @ApiOperation({
+    summary: 'Obter imagem aleatória de gato',
+    description: 'Retorna uma imagem aleatória de gato para download direto',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Imagem de gato para download',
+    schema: {
+      type: 'string',
+      format: 'binary'
+    }
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Erro ao obter imagem de gato',
+  })
+  async getRandomCat(@Res() res: Response) {
+    const catImage = await this.catService.getRandomCatImage();
+    const filePath = catImage.localPath;
+    
+    if (!fs.existsSync(filePath)) {
+      throw new BadRequestException('Imagem não encontrada');
+    }
+
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.setHeader('Content-Disposition', `inline; filename="${catImage.filename}"`);
+    
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
   }
 
   @Get(':uuid')

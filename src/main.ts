@@ -28,7 +28,7 @@ async function bootstrap() {
     )
     .addTag('auth', 'Endpoints de autenticação')
     .addTag('profile', 'Endpoints do perfil do usuário')
-    .addTag('images', 'Endpoints de upload e gerenciamento de imagens')
+    .addTag('images', 'Endpoints de upload, gerenciamento de imagens e gatos aleatórios')
     .addTag('ocr', 'Endpoints de OCR')
     .build();
 
