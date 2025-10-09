@@ -110,7 +110,7 @@ export class ImagesController {
   @Get('random-cat')
   @ApiOperation({
     summary: 'Obter imagem aleatória de gato',
-    description: 'Retorna uma imagem aleatória de gato para download direto',
+    description: 'Retorna uma imagem/gif aleatória de gato',
   })
   @ApiResponse({
     status: 200,
