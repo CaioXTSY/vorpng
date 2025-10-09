@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { ImagesModule } from './images/images.module';
+import { OcrModule } from './ocr/ocr.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ImagesModule } from './images/images.module';
     AuthModule,
     ProfileModule,
     ImagesModule,
+    OcrModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -65,3 +65,6 @@ build/Release
 .DS_Store
 Thumbs.db
 /generated/prisma
+
+# Tesseract OCR trained data files
+*.traineddata
