@@ -39,8 +39,9 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(3030);
-  console.log('🚀 Servidor rodando em http://localhost:3030');
-  console.log('📚 Documentação Swagger disponível em http://localhost:3030');
+  const port = process.env.PORT || 3123;
+  await app.listen(port);
+  console.log(`🚀 Servidor rodando na porta ${port}`);
+  console.log(`📚 Documentação Swagger disponível em http://localhost:${port}`);
 }
 bootstrap();
